@@ -1,51 +1,92 @@
-// set up express server
-var app = require('express')();
-var http = require('http').Server(app);   // Are we using HTTPS?
-// connect socket.io to express/http server.
-var io = require('socket.io')(http);
-// attaching to enviroment port (for compatibility) or 3000 if none found
-var port = process.env.PORT || 3000;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private Chat</title>
+    <!-- MAY HAVE TO SERVE CSS, TOO?? (look at chat example for help) -->
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <style>
+        /* the asterisk affects all elements */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font: 13px Helvetica, Arial;
+        }
+        form {
+            background: #000;
+            padding: 3px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        form input {
+            border: 0;
+            padding: 10px;
+            width: 90%;
+            margin-right: .5%;
+        }
+        form button {
+            width: 9%;
+            background: rgb(130, 224, 255);
+            border: none;
+            padding: 10px; 
+        }
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        #messages li {
+            padding: 5px 10px;
+        }
+        #messages li:nth-child(odd) {
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+    <p style="font-size: 50px;">Hello, 世界!</p>
+    <!-- holds list of messages -->
+    <ul id="messages"></ul>
+    <!-- removed action="" to comply with HTML5 (may pose security risks) -->
+    <!-- "return false" to avoid refresh & sending form data -->
+    <form onSubmit="return false">
+        <input id="m" autocomplete="off"/> <!-- holds input -->
+        <button>Send</button>
+    </form>
+    <!-- loading scripts here to quicken loading time-->
+    <!-- DOWNLOAD scripts -->
+    <!-- MAY NEED TO DO FUNKY STUFF TO LOAD LOCALLY?? -->
+    <script src= "https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <!-- jquery speeds up HTML interaction/scripting -->
+    <script src= "https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+        $(function () {
+            // set up socket.io on client
+            var socket = io();
 
-// serving initial files from server to client (upon request/site load, via express)
-// (dynamic/non-static site, so files *must* be served)
-app.get('/', function(req, res){          // GET okay here (just serving html)?
-    // serve index
-    res.sendFile(__dirname + '/index.html');
-});
+            // when form is submitted
+            $('form').submit(function(){
+                // emit message value to server as 'chat message' event
+                socket.emit('chat message', $('#m').val());
 
-// on client connect, do actions and register .on event handlers for clients events
-io.on('connection', function(socket){
-    /* SAME FOR THE OTHER EVENTS
+                // clear input field (empty string)
+                $('#m').val('');
+            });
 
-    // RENAME COMMENT TO BE MORE DESCRIPTIVE?
-    // ^,e.g.,
-    // when message is sent
-    // on message sent, blah blah
-    // ^"sent" from perspective of user (which is what really matters, anyways)
-    // on 'chat message' event, recieve and print message
-
-    */
-    socket.on('chat message', function(msg){
-        // emit chat message to all clients (and self)
-        // NOTE: DOESN'T HAVE TO BE SAME NAME
-        // SWITCH NAME TO STOP CONFUSION (send/receive)
-        io.emit('chat message1', msg);
-
-        // log message
-        console.log('message: ' + msg);
-    });
-
-    console.log('a user connected');  // logs (prints) to node.js server/terminal
-
-    // on client disconnect, do x
-    socket.on('disconnect', function(){
-        console.log('user disconnected')
-    });
-});
-
-// http server listens to open port (via express)
-// NO NEED TO DO ANYTHING IN ADDITION< THOUGH
-// SO YOU CAN COMMENT THIS OUt
-http.listen(port, function(){
-    console.log('listening on *:' + port);  // log upon starting
-});
+            // on 'chat message', recieve message
+            socket.on('chat message1', function(msg){
+                // test to show how to print to client console
+                // (otherwise, if done in server-side script, it prints to server terminal)
+                console.log(msg);
+                // add message as text to list
+                $('#messages').append($('<li>').text(msg));
+            });
+        });
+    </script>
+</body>
+</html>
