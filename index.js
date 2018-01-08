@@ -3,7 +3,8 @@ var app = require('express')();
 var http = require('http').Server(app);   // Are we using HTTPS?
 // connect socket.io to express/http server.
 var io = require('socket.io')(http);
-
+// attaching to enviroment port (for compatibility) or 3000 if none found
+var port = process.env.PORT || 3000;
 
 // serving initial files from server to client (upon request/site load, via express)
 // (dynamic/non-static site, so files *must* be served)
@@ -42,7 +43,9 @@ io.on('connection', function(socket){
     });
 });
 
-// http server listens to certain port (via express)
-http.listen(3000, function(){
-    console.log('listening on *:3000');  // log upon starting
+// http server listens to open port (via express)
+// NO NEED TO DO ANYTHING IN ADDITION< THOUGH
+// SO YOU CAN COMMENT THIS OUt
+http.listen(port, function(){
+    console.log('listening on *:' + port);  // log upon starting
 });
