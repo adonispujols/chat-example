@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Private Chat</title>
-    <!-- MAY HAVE TO SERVE CSS, TOO? (look at chat example for help) -->
+    <!-- MAY HAVE TO SERVE CSS, TOO?? (look at chat example for help) -->
     <!-- <link rel="stylesheet" href="style.css"> -->
     <style>
         /* the asterisk affects all elements */
@@ -80,6 +80,9 @@
 
             // on 'chat message', recieve message
             socket.on('chat message1', function(msg){
+                // test to show how to print to client console
+                // (otherwise, if done in server-side script, it prints to server terminal)
+                console.log(msg);
                 // add message as text to list
                 $('#messages').append($('<li>').text(msg));
             });
